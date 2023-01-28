@@ -135,7 +135,7 @@ input.addEventListener("keydown", function (e) {
     loading.id = "loading";
     loading.textContent = "Loading...";
     document.querySelector("div#main").appendChild(loading);
-    fetch(query)
+    fetch(`/search?q=${query}`)
       .then(response => response.text())
       .then(data => {
         const parsedDOM = new DOMParser().parseFromString(data, "text/html")
