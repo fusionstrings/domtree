@@ -125,6 +125,21 @@ let allTrees = [];
 const leafCoordinates = [];
 const rootTree = Tree(svgWidth / 2, svgHeight, svgWidth / 200, "black");
 
+function generateTreeFromDOM(dom) {
+  const parsedDOM = new DOMParser().parseFromString(dom, "text/html")
+    .body.childNodes;
+  rootTree.angle = 0;
+  allTrees = [rootTree];
+  document.querySelector("div#loading").remove();
+  for (let i = 0; i < parsedDOM.length; i++) {
+    scrape(parsedDOM[i], rootTree);
+    rootTree.isLeaf = false;
+  }
+
+  assignLeaves();
+  drawTree(allTrees, leafCoordinates);
+}
+
 //Draw tree when input detected.
 const input = document.querySelector("input#url");
 input.addEventListener("keydown", function (e) {
@@ -138,18 +153,7 @@ input.addEventListener("keydown", function (e) {
     fetch(`/search?q=${query}`)
       .then(response => response.text())
       .then(data => {
-        const parsedDOM = new DOMParser().parseFromString(data, "text/html")
-          .body.childNodes;
-        rootTree.angle = 0;
-        allTrees = [rootTree];
-        document.querySelector("div#loading").remove();
-        for (let i = 0; i < parsedDOM.length; i++) {
-          scrape(parsedDOM[i], rootTree);
-          rootTree.isLeaf = false;
-        }
-
-        assignLeaves();
-        drawTree(allTrees, leafCoordinates);
+        generateTreeFromDOM(data);
         addListeners();
       });
   }
@@ -241,3 +245,5 @@ const drawTree = function (allTrees, leafCoordinates) {
     })
     .attr("fill", color.leafColor);
 };
+
+export { generateTreeFromDOM }
